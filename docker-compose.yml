@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  db:
+    container_name: db_mb_tickers
+    image: postgres:13
+    networks:
+      - app-networks
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: db_mb_tickets
+    ports:
+      - "5432:5432"
+  app:
+    build: .
+    entrypoint: [ "npm", "run", "start:dev" ]
+    volumes:
+      - .:/home/node/app
+    networks:
+      - app-networks
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+networks:
+  app-networks:
+    driver: bridge
