@@ -3,6 +3,8 @@
 /node_modules
 
 /pgdata
+secrets.txt
+.env
 
 # Logs
 logs

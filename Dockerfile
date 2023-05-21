@@ -1,8 +1,28 @@
+FROM node:19-alpine as builder
+
+ENV NODE_ENV build
+
+# USER node
+WORKDIR /home/node
+
+COPY package*.json ./
+RUN npm ci
+
+COPY --chown=node:node . .
+RUN npm run build \
+    && npm prune --production
+
+# ---
+
 FROM node:19-alpine
 
-COPY . .
-WORKDIR /home/node/app
+ENV NODE_ENV production
 
-RUN npm install
+# USER node
+WORKDIR /home/node
 
-EXPOSE 3000
+COPY --from=builder --chown=node:node /home/node/package*.json ./
+COPY --from=builder --chown=node:node /home/node/node_modules/ ./node_modules/
+COPY --from=builder --chown=node:node /home/node/dist/ ./dist/
+
+CMD ["node", "dist/main.js"]

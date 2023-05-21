@@ -13,7 +13,9 @@ services:
     ports:
       - "5432:5432"
   app:
-    build: .
+    build:
+      context: ./
+      dockerfile: dev.Dockerfile
     entrypoint: [ "npm", "run", "start:dev" ]
     volumes:
       - .:/home/node/app
