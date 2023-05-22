@@ -1,0 +1,8 @@
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  date        DateTime
+  start_time  DateTime
+  end_time    DateTime
+}
