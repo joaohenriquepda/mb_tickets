@@ -6,7 +6,10 @@ ENV NODE_ENV build
 WORKDIR /home/node
 
 COPY package*.json ./
+COPY . . 
 RUN npm ci
+RUN npx prisma generate
+
 
 COPY --chown=node:node . .
 RUN npm run build \
