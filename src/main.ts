@@ -2,10 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { HttpExceptionFilter } from './error/http-exception-filter';
+import { ErrorsInterceptor } from './error/errors-interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalInterceptors(new ErrorsInterceptor())
 
   const config = new DocumentBuilder()
     .setTitle('MB Tickets')
