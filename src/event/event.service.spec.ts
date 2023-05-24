@@ -49,7 +49,7 @@ describe('EventService', () => {
     expect(eventService.create(createDto)).rejects.toThrow("Argument title for data.title is missing.")
   });
 
-  xit('should not create a new entity without date', async () => {
+  it('should not create a new entity without date', async () => {
     delete createDto.date;
     expect(eventService.create(createDto)).rejects.toThrow()
   });

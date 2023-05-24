@@ -3,6 +3,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { RollbarLogger } from 'nestjs-rollbar';
+import { Event } from './entities/event.entity';
 
 @Injectable()
 export class EventService {
@@ -26,4 +27,31 @@ export class EventService {
     this.rollbarLogger.debug(`[${EventService.name}] - Event was created - DATA: ${JSON.stringify(createdEvent)}`, JSON.stringify(createdEvent))
     return createdEvent
   }
+
+  async update(id: number, updateEvent: Partial<Event>): Promise<Event> {
+
+    this.rollbarLogger.info(`[${EventService.name}] - Initial update event - DATA: ${JSON.stringify(updateEvent)}`, JSON.stringify(updateEvent))
+
+    const updatedEvent = await this.prisma.event.update({
+      where: { id },
+      data: updateEvent,
+    });
+
+    this.rollbarLogger.info(`[${EventService.name}] - Event was created - DATA: ${JSON.stringify(updatedEvent)}`, JSON.stringify(updatedEvent))
+    return updatedEvent;
+  }
+
+  async findOne(id: number): Promise<Event> {
+    this.rollbarLogger.info(`${new Date().valueOf()} - [${EventService.name}] - Initial get event - DATA: ID: ${JSON.stringify(id)}`, { id })
+
+    const specificEvent = await this.prisma.event.findUniqueOrThrow({
+      where: { id }
+    });
+
+    this.rollbarLogger.info(`${new Date().valueOf()} - [${EventService.name}] - Event was created - DATA: ${JSON.stringify(specificEvent)}`, JSON.stringify(specificEvent))
+    return specificEvent;
+
+  }
+
+
 }
