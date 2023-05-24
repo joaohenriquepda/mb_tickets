@@ -7,7 +7,11 @@ import { ErrorsInterceptor } from './error/errors-interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: true,
+  }));
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new ErrorsInterceptor())
 
@@ -15,7 +19,6 @@ async function bootstrap() {
     .setTitle('MB Tickets')
     .setDescription('The API for management for MB Tickets')
     .setVersion('1.0')
-    .addTag('')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

@@ -16,3 +16,10 @@ model Event {
   start_time  DateTime
   end_time    DateTime
 }
+
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+  name     String
+}

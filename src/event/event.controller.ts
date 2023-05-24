@@ -7,8 +7,8 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { ShowEventDto } from './dto/show-event-dto';
 
 
-@Controller('/event')
-@ApiTags('/event')
+@Controller('event')
+@ApiTags('event')
 export class EventController {
   constructor(
     private readonly eventService: EventService,
