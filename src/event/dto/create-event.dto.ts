@@ -1,33 +1,25 @@
-import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Length, MinDate } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Length } from "class-validator";
 import { Event } from "../entities/event.entity";
 import { ApiProperty } from "@nestjs/swagger";
-import { TransformDate } from "src/validators/date.transformer";
-import { TransformTitle } from "src/validators/title.transformer";
 
 export class CreateEventDto extends Event {
 
     @IsString()
     @IsNotEmpty()
-    @Length(10, 20)
-    @TransformTitle()
+    @Length(10, 50)
     title: string
 
     @IsOptional()
     @IsString()
     description: string;
 
-    @IsDate()
-    @TransformDate()
+
     date: Date;
 
-    @IsDate()
-    @MinDate(new Date())
-    @TransformDate()
+
     start_time: Date;
 
-    @IsDate()
-    @MinDate(new Date())
-    @TransformDate()
+
     end_time: Date;
 
 }
