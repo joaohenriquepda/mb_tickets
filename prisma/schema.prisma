@@ -15,11 +15,28 @@ model Event {
   date        DateTime
   start_time  DateTime
   end_time    DateTime
+  tickets     Ticket[]
+
+  @@map("events")
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
   password String
   name     String
+  tickets  Ticket[]
+
+  @@map("users")
+}
+
+model Ticket {
+  event   Event    @relation(fields: [eventId], references: [id])
+  eventId Int      @map("event_id")
+  user    User     @relation(fields: [userId], references: [id])
+  userId  Int      @map("user_id")
+  soldAt  DateTime @default(now()) @map("sold_at")
+
+  @@id([eventId, userId])
+  @@map("tickets")
 }

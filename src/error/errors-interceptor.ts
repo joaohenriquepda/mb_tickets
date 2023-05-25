@@ -23,9 +23,11 @@ export class ErrorsInterceptor implements NestInterceptor {
 
                     switch (code) {
                         case "P2025":
-                            throw new NotFoundException(message)
+                            throw new NotFoundException(message);
+                        case "P2002":
+                            throw new Error(error);
                         default:
-                            throw error
+                            throw error;
                     }
                 }))
     }
