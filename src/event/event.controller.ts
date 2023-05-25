@@ -6,6 +6,7 @@ import { RollbarLogger } from 'nestjs-rollbar';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { ShowEventDto } from './dto/show-event-dto';
 import { IsPublic } from '../auth/decorators/is-public.decorator';
+import { CurrentUserDto } from 'src/user/dto/current-user.dto';
 
 @Controller('event')
 @ApiTags('event')
@@ -102,15 +103,16 @@ export class EventController {
     }
   }
 
+  @ApiBody({ description: "Body buy a ticket", type: CurrentUserDto })
   @ApiBearerAuth('defaultBearerAuth')
   @ApiResponse({ status: 201, description: 'Ticket sale success', type: ShowEventDto })
   @ApiOperation({ summary: 'Sale a ticket event' })
   @Post(':id/tickets')
-  async saleTicket(@Param('id') id: number) {
+  async saleTicket(@Param('id') id: number, @Body() user: Partial<CurrentUserDto>) {
 
     try {
       this.rollbarLogger.debug(`${new Date().valueOf()} - [${EventController.name}] - Initiate sale for ticket - DATA: ID: ${id}`, { id });
-      const ticket = await this.eventService.saleTicket(id, 2);
+      const ticket = await this.eventService.saleTicket(id, user.id);
 
       this.rollbarLogger.debug(`${new Date().valueOf()} - [${EventController.name}] - Sale Ticket - DATA: ${ticket}`, { ticket });
       return ticket
@@ -123,7 +125,7 @@ export class EventController {
 
   @ApiBearerAuth('defaultBearerAuth')
   @ApiResponse({ status: 201, description: 'Event ticket list', type: ShowEventDto })
-  @ApiOperation({ summary: 'Sale a ticket event' })
+  @ApiOperation({ summary: 'Get ticket list by event' })
   @Get(':id/tickets')
   async getTicketsByEvent(@Param('id') id: number) {
 

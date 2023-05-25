@@ -100,15 +100,15 @@ export class EventService {
   }
 
 
-  async saleTicket(eventId: number, userId: number): Promise<Ticket> {
+  async saleTicket(event_id: number, user_id: number): Promise<Ticket> {
 
     try {
-      this.rollbarLogger.info(`${new Date().valueOf()} - [${EventService.name}] - Initial sale ticket event - DATA: ID: ${JSON.stringify(eventId)}`, { eventId })
+      this.rollbarLogger.info(`${new Date().valueOf()} - [${EventService.name}] - Initial sale ticket event - DATA: ID: ${JSON.stringify(event_id)}`, { event_id })
 
       const ticket = await this.prisma.ticket.create({
         data: {
-          userId,
-          eventId
+          userId: user_id,
+          eventId: event_id
         },
         include: { event: true }
       });
