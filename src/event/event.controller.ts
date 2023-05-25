@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, Put } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RollbarLogger } from 'nestjs-rollbar';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { ShowEventDto } from './dto/show-event-dto';
-
+import { IsPublic } from '../auth/decorators/is-public.decorator';
 
 @Controller('event')
 @ApiTags('event')
@@ -14,6 +14,7 @@ export class EventController {
     private readonly eventService: EventService,
     private readonly rollbarLogger: RollbarLogger) { }
 
+  @IsPublic()
   @Get()
   @ApiOperation({ summary: 'Get all events' })
   @ApiResponse({ status: 200, description: 'Returns an array of events', type: [ShowEventDto] })
@@ -29,6 +30,7 @@ export class EventController {
 
   }
 
+  @ApiBearerAuth('defaultBearerAuth')
   @ApiBody({ description: "Body for create event", type: CreateEventDto })
   @ApiResponse({ status: 201, description: 'Returns created event', type: ShowEventDto })
   @ApiOperation({ summary: 'Create a unique event' })
@@ -49,6 +51,7 @@ export class EventController {
 
   }
 
+  @ApiBearerAuth('defaultBearerAuth')
   @ApiBody({ description: "Body for update event", type: UpdateEventDto })
   @ApiResponse({ status: 200, description: 'Event update success', type: ShowEventDto })
   @ApiResponse({ status: 404, description: "Not found" })
@@ -66,7 +69,7 @@ export class EventController {
     }
   }
 
-
+  @ApiBearerAuth('defaultBearerAuth')
   @ApiOperation({ summary: 'Search a unique event' })
   @Get(':id')
   async getEvent(@Param('id') id: number, @Body() updateEvent: Partial<UpdateEventDto>) {
@@ -81,6 +84,7 @@ export class EventController {
     }
   }
 
+  @ApiBearerAuth('defaultBearerAuth')
   @ApiResponse({ status: 200, description: 'Event delete success', type: ShowEventDto })
   @ApiOperation({ summary: 'Delete a unique event' })
   @Delete(':id')

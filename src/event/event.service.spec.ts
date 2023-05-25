@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { EventService } from './event.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto } from './dto/create-event.dto';
+import { LoggerModule } from 'nestjs-rollbar';
 
 describe('EventService', () => {
   let eventService: EventService
@@ -25,6 +26,10 @@ describe('EventService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [EventService, PrismaService],
+      imports: [LoggerModule.forRoot({
+        accessToken: process.env["ROLLBAR_LOGGER"],
+        environment: process.env.NODE_ENV,
+      })]
     }).compile();
 
     eventService = module.get<EventService>(EventService);
