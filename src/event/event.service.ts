@@ -4,13 +4,15 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { RollbarLogger } from 'nestjs-rollbar';
 import { Event } from './entities/event.entity';
+import { Ticket } from '@prisma/client';
 
 @Injectable()
 export class EventService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly rollbarLogger: RollbarLogger) { }
+    private readonly rollbarLogger: RollbarLogger,
+  ) { }
 
   async findAll() {
     try {
@@ -58,7 +60,6 @@ export class EventService {
       this.rollbarLogger.error(`${new Date().valueOf()} - [${EventService.name}]- An error occurred while updating the event - DATA: ${error}`, JSON.stringify(error))
       throw error
     }
-
   }
 
   async findOne(id: number): Promise<Event> {
@@ -94,6 +95,51 @@ export class EventService {
 
     } catch (error) {
       this.rollbarLogger.error(`${new Date().valueOf()} - [${EventService.name}]- An error occurred while removing the event - DATA: ${error}`, JSON.stringify(error))
+      throw error
+    }
+  }
+
+
+  async saleTicket(eventId: number, userId: number): Promise<Ticket> {
+
+    try {
+      this.rollbarLogger.info(`${new Date().valueOf()} - [${EventService.name}] - Initial sale ticket event - DATA: ID: ${JSON.stringify(eventId)}`, { eventId })
+
+      const ticket = await this.prisma.ticket.create({
+        data: {
+          userId,
+          eventId
+        },
+        include: { event: true }
+      });
+
+      this.rollbarLogger.info(`${new Date().valueOf()} - [${EventService.name}] - Ticket sale success - DATA: ${JSON.stringify(ticket)}`, JSON.stringify(ticket))
+      return ticket;
+
+    } catch (error) {
+      this.rollbarLogger.error(`${new Date().valueOf()} - [${EventService.name}]- An error occurred while removing the event - DATA: ${error}`, JSON.stringify(error))
+      throw error
+    }
+  }
+
+
+  async getTicketsByEvent(eventId: number): Promise<Ticket[]> {
+
+    try {
+      this.rollbarLogger.info(`${new Date().valueOf()} - [${EventService.name}] - Initial sale ticket event - DATA: ID: ${JSON.stringify(eventId)}`, { eventId })
+
+      const tickets = await this.prisma.ticket.findMany({
+        where: {
+          eventId
+        },
+        include: { user: true }
+      });
+
+      this.rollbarLogger.info(`${new Date().valueOf()} - [${EventService.name}] - Ticket List success}`, JSON.stringify(tickets))
+      return tickets;
+
+    } catch (error) {
+      this.rollbarLogger.error(`${new Date().valueOf()} -[${EventService.name}] - An error occurred while List the event - DATA: ${error} `, JSON.stringify(error))
       throw error
     }
   }

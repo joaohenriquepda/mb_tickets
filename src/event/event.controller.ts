@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, Put, Req } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -12,7 +12,8 @@ import { IsPublic } from '../auth/decorators/is-public.decorator';
 export class EventController {
   constructor(
     private readonly eventService: EventService,
-    private readonly rollbarLogger: RollbarLogger) { }
+    private readonly rollbarLogger: RollbarLogger,
+  ) { }
 
   @IsPublic()
   @Get()
@@ -89,12 +90,54 @@ export class EventController {
   @ApiOperation({ summary: 'Delete a unique event' })
   @Delete(':id')
   async removeEvent(@Param('id') id: number) {
-    this.rollbarLogger.debug(`${new Date().valueOf()} - [${EventController.name}] - Initiate delete event - DATA: ID: ${id}`, { id });
-    const updatedEvent = await this.eventService.deleteOne(id);
+    try {
+      this.rollbarLogger.debug(`${new Date().valueOf()} - [${EventController.name}] - Initiate delete event - DATA: ID: ${id}`, { id });
+      const updatedEvent = await this.eventService.deleteOne(id);
 
-    this.rollbarLogger.debug(`${new Date().valueOf()} - [${EventController.name}] - Delete Event - DATA: ID: ${id}`, { id });
-    return updatedEvent
+      this.rollbarLogger.debug(`${new Date().valueOf()} - [${EventController.name}] - Delete Event - DATA: ID: ${id}`, { id });
+      return updatedEvent
+    } catch (error) {
+      this.rollbarLogger.error(`${new Date().valueOf()} - [${EventController.name}]- An error occurred while remove the event - DATA: ${error}`, JSON.stringify(error))
+      throw error
+    }
+  }
 
+  @ApiBearerAuth('defaultBearerAuth')
+  @ApiResponse({ status: 201, description: 'Ticket sale success', type: ShowEventDto })
+  @ApiOperation({ summary: 'Sale a ticket event' })
+  @Post(':id/tickets')
+  async saleTicket(@Param('id') id: number) {
+
+    try {
+      this.rollbarLogger.debug(`${new Date().valueOf()} - [${EventController.name}] - Initiate sale for ticket - DATA: ID: ${id}`, { id });
+      const ticket = await this.eventService.saleTicket(id, 2);
+
+      this.rollbarLogger.debug(`${new Date().valueOf()} - [${EventController.name}] - Sale Ticket - DATA: ${ticket}`, { ticket });
+      return ticket
+
+    } catch (error) {
+      this.rollbarLogger.error(`${new Date().valueOf()} - [${EventController.name}]- An error occurred while sale ticket - DATA: ${error}`, JSON.stringify(error))
+      throw error
+    }
+  }
+
+  @ApiBearerAuth('defaultBearerAuth')
+  @ApiResponse({ status: 201, description: 'Event ticket list', type: ShowEventDto })
+  @ApiOperation({ summary: 'Sale a ticket event' })
+  @Get(':id/tickets')
+  async getTicketsByEvent(@Param('id') id: number) {
+
+    try {
+      this.rollbarLogger.debug(`${new Date().valueOf()} - [${EventController.name}] - Initiate get ticket list  - DATA: ID: ${id}`, { id });
+      const tickets = await this.eventService.getTicketsByEvent(id);
+
+      this.rollbarLogger.debug(`${new Date().valueOf()} - [${EventController.name}] - List Ticket - DATA: ${tickets}`, { tickets });
+      return tickets
+
+    } catch (error) {
+      this.rollbarLogger.error(`${new Date().valueOf()} - [${EventController.name}]- An error occurred while List ticket - DATA: ${error}`, JSON.stringify(error))
+      throw error
+    }
   }
 
 }

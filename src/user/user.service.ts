@@ -59,6 +59,9 @@ export class UserService {
         where: {
           id: id,
         },
+        include: {
+          tickets: { include: { event: true } }
+        }
       });
 
       this.rollbarLogger.info(`${new Date().valueOf()} - [${UserService.name}] - Event was created - DATA: ${JSON.stringify(specificUser)}`, JSON.stringify(specificUser))
